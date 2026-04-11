@@ -90,7 +90,7 @@ function extractRows(endpoint: string, data: NeisApiResponse): NeisRow[] {
 	return rows;
 }
 
-export function parseDishes(raw: string | undefined): string[] {
+export function trimmer(raw: string | undefined): string[] {
 	if (!raw) return [];
 	const separators = ["<br/>", "<br>", "\\n", "\n"];
 	let parts = [raw];

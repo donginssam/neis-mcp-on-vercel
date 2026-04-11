@@ -22,7 +22,7 @@ export const OFFICE_OF_EDUCATION_CODES: Record<string, string> = {
 	강원특별자치도교육청: "K10",
 	충청북도교육청: "M10",
 	충청남도교육청: "N10",
-	전라북도교육청: "P10",
+	전북특별자치도교육청: "P10",
 	전라남도교육청: "Q10",
 	경상북도교육청: "R10",
 	경상남도교육청: "S10",

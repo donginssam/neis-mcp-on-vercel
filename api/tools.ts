@@ -1,5 +1,5 @@
 import { TIMETABLE_ENDPOINTS } from "./constants.js";
-import { neisRequest, parseDishes } from "./neis-client.js";
+import { neisRequest, trimmer } from "./neis-client.js";
 import type { NeisParams } from "./types/neis.js";
 import type {
 	SearchSchoolsParams,
@@ -72,9 +72,9 @@ export async function getSchoolMeals({
 		meal_code: row.MMEAL_SC_CODE,
 		meal_name: row.MMEAL_SC_NM,
 		calories: row.CAL_INFO,
-		dishes: parseDishes(row.DDISH_NM),
-		origin_info: row.ORPLC_INFO,
-		nutrition_info: row.NTR_INFO,
+		dishes: trimmer(row.DDISH_NM),
+		origin_info: trimmer(row.ORPLC_INFO),
+		nutrition_info: trimmer(row.NTR_INFO),
 		school_name: row.SCHUL_NM,
 	}));
 }
@@ -107,7 +107,7 @@ export async function getSchoolTimetable({
 		pSize: page_size,
 	};
 	if (date) {
-		params.TI_YMD = date;
+		params.ALL_TI_YMD = date;
 	} else {
 		if (start_date) params.TI_FROM_YMD = start_date;
 		if (end_date) params.TI_TO_YMD = end_date;
@@ -119,8 +119,7 @@ export async function getSchoolTimetable({
 		period: row.PERIO,
 		subject_name: row.ITRT_CNTNT,
 		assembly_name: row.CLASS_NM,
-		grade: row.GRADE,
-		teacher: row.TEA_NM,
+		grade: row.GRADE
 	}));
 }
 
@@ -150,9 +149,6 @@ export async function getAcademicSchedule({
 	return rows.map((row) => ({
 		date: row.AA_YMD,
 		event_name: row.EVENT_NM,
-		event_content: row.EVENT_CNTNT,
-		grade: row.GRADE,
-		assembly_name: row.CLASS_NM,
-		event_type: row.EVENT_NM,
+		event_content: row.EVENT_CNTNT
 	}));
 }
