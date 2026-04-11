@@ -5,3 +5,5 @@ npm-debug.log*
 # TypeScript
 dist/
 *.tsbuildinfo
+.vercel
+.env*.local
