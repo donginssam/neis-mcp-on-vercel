@@ -8,8 +8,6 @@ import type {
 	NeisParams,
 } from "./types/neis.js";
 
-// ─── NEIS API Client ──────────────────────────────────────────────────────────
-
 export async function neisRequest(
 	endpoint: string,
 	params: NeisParams = {}

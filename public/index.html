@@ -1,11 +1,303 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World</title>
+    <title>NEIS MCP</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0a0a;
+            color: #e5e5e5;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 60px 24px 80px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 56px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            margin-top: 12px;
+            font-size: 1.05rem;
+            color: #a3a3a3;
+        }
+
+        /* Endpoint */
+        .endpoint-section {
+            margin-bottom: 48px;
+        }
+
+        .endpoint-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #171717;
+            border: 1px solid #262626;
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
+        .endpoint-url {
+            flex: 1;
+            font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace;
+            font-size: 0.9rem;
+            color: #e5e5e5;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .copy-btn {
+            flex-shrink: 0;
+            background: #262626;
+            border: 1px solid #404040;
+            color: #a3a3a3;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        .copy-btn.copied {
+            background: #14532d;
+            border-color: #166534;
+            color: #4ade80;
+        }
+
+        /* Guide cards */
+        .guide-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .card {
+            background: #171717;
+            border: 1px solid #262626;
+            border-radius: 12px;
+            padding: 24px;
+            transition: border-color 0.15s ease;
+        }
+
+        .card:hover {
+            border-color: #404040;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .card-icon.claude {
+            background: #2d1f0e;
+            color: #f59e0b;
+        }
+
+        .card-icon.chatgpt {
+            background: #0d2818;
+            color: #4ade80;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .steps {
+            list-style: none;
+            counter-reset: step;
+        }
+
+        .steps li {
+            counter-increment: step;
+            position: relative;
+            padding-left: 32px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #a3a3a3;
+        }
+
+        .steps li:last-child {
+            margin-bottom: 0;
+        }
+
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 1px;
+            width: 22px;
+            height: 22px;
+            background: #262626;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #737373;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .steps li strong {
+            color: #d4d4d4;
+            font-weight: 500;
+        }
+
+        /* Tools */
+        .tools-section h2 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #525252;
+            margin-bottom: 16px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 10px;
+        }
+
+        .tool-tag {
+            background: #171717;
+            border: 1px solid #262626;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.82rem;
+            color: #a3a3a3;
+            text-align: center;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 56px;
+            padding-top: 24px;
+            border-top: 1px solid #1a1a1a;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #525252;
+            text-decoration: none;
+            font-size: 0.82rem;
+            transition: color 0.15s ease;
+        }
+
+        .footer a:hover {
+            color: #a3a3a3;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World</h1>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>NEIS MCP</h1>
+            <p>NEIS 교육정보를 AI에서 바로 활용하세요</p>
+        </div>
+
+        <!-- Endpoint -->
+        <div class="endpoint-section">
+            <div class="endpoint-box">
+                <span class="endpoint-url">https://neis-mcp.vercel.app/mcp</span>
+                <button class="copy-btn" onclick="copyEndpoint(this)">복사</button>
+            </div>
+        </div>
+
+        <!-- Guide Cards -->
+        <div class="guide-cards">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon claude">C</div>
+                    <div class="card-title">Claude에 연결하기</div>
+                </div>
+                <ol class="steps">
+                    <li><strong>사용자 지정</strong> → <strong>커넥터</strong> → <strong>커스텀 커넥터 추가</strong> 선택</li>
+                    <li>원격 MCP 서버 URL에 위 주소를 붙여넣고 저장</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon chatgpt">G</div>
+                    <div class="card-title">ChatGPT에 연결하기</div>
+                </div>
+                <ol class="steps">
+                    <li>ChatGPT 설정 → <strong>Connectors</strong> → <strong>Add connector</strong> 선택</li>
+                    <li>MCP 서버 URL에 위 주소를 붙여넣고 저장</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Available Tools -->
+        <div class="tools-section">
+            <h2>제공 기능</h2>
+            <div class="tools-grid">
+                <div class="tool-tag">학교 검색</div>
+                <div class="tool-tag">급식 정보</div>
+                <div class="tool-tag">시간표 조회</div>
+                <div class="tool-tag">학사일정</div>
+                <div class="tool-tag">교육청 코드</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <a href="https://github.com/donginssam/neis-mcp-on-vercel" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </div>
+
+    <script>
+        function copyEndpoint(btn) {
+            navigator.clipboard.writeText('https://neis-mcp.vercel.app/mcp').then(function () {
+                btn.textContent = '복사됨';
+                btn.classList.add('copied');
+                setTimeout(function () {
+                    btn.textContent = '복사';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
 </body>
 </html>

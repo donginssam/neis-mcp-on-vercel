@@ -1,5 +1,3 @@
-// ─── NEIS API types ───────────────────────────────────────────────────────────
-
 export type NeisRow = Record<string, string>;
 
 export interface NeisResultInfo {

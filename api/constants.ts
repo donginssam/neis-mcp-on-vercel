@@ -1,5 +1,3 @@
-// ─── Constants ────────────────────────────────────────────────────────────────
-
 export const NEIS_BASE_URL = "https://open.neis.go.kr/hub";
 
 export const TIMETABLE_ENDPOINTS: Record<string, string> = {

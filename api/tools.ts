@@ -1,6 +1,7 @@
 import { TIMETABLE_ENDPOINTS } from "./constants.js";
 import { neisRequest, trimmer } from "./neis-client.js";
 import type { NeisParams } from "./types/neis.js";
+import type { DateRangeParams, PaginationParams } from "./types/tools.js";
 import type {
 	SearchSchoolsParams,
 	GetSchoolMealsParams,
@@ -8,19 +9,30 @@ import type {
 	GetAcademicScheduleParams,
 } from "./types/tools.js";
 
-// ─── Tool implementations ─────────────────────────────────────────────────────
+function buildPaginationParams({ page, page_size }: PaginationParams): NeisParams {
+	return { pIndex: page, pSize: page_size };
+}
+
+function buildDateParams(
+	{ date, start_date, end_date }: DateRangeParams,
+	keys: { exact: string; from: string; to: string }
+): NeisParams {
+	if (date) return { [keys.exact]: date };
+	return {
+		...(start_date && { [keys.from]: start_date }),
+		...(end_date && { [keys.to]: end_date }),
+	};
+}
 
 export async function searchSchools({
 	school_name,
 	region_code,
-	page,
-	page_size,
+	...pagination
 }: SearchSchoolsParams) {
 	const rows = await neisRequest("schoolInfo", {
 		SCHUL_NM: school_name,
 		ATPT_OFCDC_SC_CODE: region_code,
-		pIndex: page,
-		pSize: page_size,
+		...buildPaginationParams(pagination),
 	});
 	return rows.map((row) => ({
 		education_office_code: row.ATPT_OFCDC_SC_CODE,
@@ -45,28 +57,22 @@ export async function searchSchools({
 export async function getSchoolMeals({
 	region_code,
 	school_code,
+	meal_code,
 	date,
 	start_date,
 	end_date,
-	meal_code,
-	page,
-	page_size,
+	...pagination
 }: GetSchoolMealsParams) {
-	const params: NeisParams = {
+	const rows = await neisRequest("mealServiceDietInfo", {
 		ATPT_OFCDC_SC_CODE: region_code,
 		SD_SCHUL_CODE: school_code,
 		MMEAL_SC_CODE: meal_code,
-		pIndex: page,
-		pSize: page_size,
-	};
-	if (date) {
-		params.MLSV_YMD = date;
-	} else {
-		if (start_date) params.MLSV_FROM_YMD = start_date;
-		if (end_date) params.MLSV_TO_YMD = end_date;
-	}
-
-	const rows = await neisRequest("mealServiceDietInfo", params);
+		...buildDateParams(
+			{ date, start_date, end_date },
+			{ exact: "MLSV_YMD", from: "MLSV_FROM_YMD", to: "MLSV_TO_YMD" }
+		),
+		...buildPaginationParams(pagination),
+	});
 	return rows.map((row) => ({
 		date: row.MLSV_YMD,
 		meal_code: row.MMEAL_SC_CODE,
@@ -88,8 +94,7 @@ export async function getSchoolTimetable({
 	date,
 	start_date,
 	end_date,
-	page,
-	page_size,
+	...pagination
 }: GetSchoolTimetableParams) {
 	const endpoint = TIMETABLE_ENDPOINTS[school_level.toLowerCase()];
 	if (!endpoint) {
@@ -98,29 +103,26 @@ export async function getSchoolTimetable({
 		);
 	}
 
-	const params: NeisParams = {
+	const rows = await neisRequest(endpoint, {
 		ATPT_OFCDC_SC_CODE: region_code,
 		SD_SCHUL_CODE: school_code,
 		GRADE: grade,
 		CLASS_NM: class_name,
-		pIndex: page,
-		pSize: page_size,
-	};
-	if (date) {
-		params.ALL_TI_YMD = date;
-	} else {
-		if (start_date) params.TI_FROM_YMD = start_date;
-		if (end_date) params.TI_TO_YMD = end_date;
-	}
-
-	const rows = await neisRequest(endpoint, params);
-	return rows.map((row) => ({
-		date: row.ALL_TI_YMD,
-		period: row.PERIO,
-		subject_name: row.ITRT_CNTNT,
-		assembly_name: row.CLASS_NM,
-		grade: row.GRADE
-	}));
+		...buildDateParams(
+			{ date, start_date, end_date },
+			{ exact: "ALL_TI_YMD", from: "TI_FROM_YMD", to: "TI_TO_YMD" }
+		),
+		...buildPaginationParams(pagination),
+	});
+	return rows
+		.filter((row) => row.ITRT_CNTNT != null)
+		.map((row) => ({
+			date: row.ALL_TI_YMD,
+			period: row.PERIO,
+			subject_name: row.ITRT_CNTNT,
+			assembly_name: row.CLASS_NM,
+			grade: row.GRADE,
+		}));
 }
 
 export async function getAcademicSchedule({
@@ -129,26 +131,20 @@ export async function getAcademicSchedule({
 	date,
 	start_date,
 	end_date,
-	page,
-	page_size,
+	...pagination
 }: GetAcademicScheduleParams) {
-	const params: NeisParams = {
+	const rows = await neisRequest("SchoolSchedule", {
 		ATPT_OFCDC_SC_CODE: region_code,
 		SD_SCHUL_CODE: school_code,
-		pIndex: page,
-		pSize: page_size,
-	};
-	if (date) {
-		params.AA_YMD = date;
-	} else {
-		if (start_date) params.AA_FROM_YMD = start_date;
-		if (end_date) params.AA_TO_YMD = end_date;
-	}
-
-	const rows = await neisRequest("SchoolSchedule", params);
+		...buildDateParams(
+			{ date, start_date, end_date },
+			{ exact: "AA_YMD", from: "AA_FROM_YMD", to: "AA_TO_YMD" }
+		),
+		...buildPaginationParams(pagination),
+	});
 	return rows.map((row) => ({
 		date: row.AA_YMD,
 		event_name: row.EVENT_NM,
-		event_content: row.EVENT_CNTNT
+		event_content: row.EVENT_CNTNT,
 	}));
 }
