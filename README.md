@@ -2,7 +2,7 @@
 
 ## 개요
 
-**NEIS MCP**는 [NEIS 교육정보 개방 포털](https://open.neis.go.kr)의 데이터를 MCP(Model Context Protocol) 엔드포인트로 제공합니다.
+**NEIS MCP**는 [NEIS 교육정보 개방 포털](https://open.neis.go.kr)의 데이터를 MCP(Model Context Protocol) 엔드포인트로 제공합니다.<br>
 급식 정보, 시간표, 학교 정보 등을 표준화된 API 하나로 AI 클라이언트에서 바로 활용할 수 있습니다.
 
 이 저장소는 [@gandandev/neis-mcp](https://github.com/gandandev/neis-mcp) 코드를 Vercel로 배포할 수 있도록 수정한 버전입니다.

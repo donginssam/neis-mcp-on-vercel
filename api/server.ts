@@ -1,4 +1,5 @@
 import { createMcpHandler } from "mcp-handler";
+import pkg from "../package.json" with { type: "json" };
 import { z } from "zod";
 import { OFFICE_OF_EDUCATION_CODES } from "./constants.js";
 import {
@@ -41,8 +42,13 @@ const handler = createMcpHandler((server) => {
 	server.registerTool(
 		"list_education_office_codes",
 		{
+			title: "교육청 코드 목록 나열",
 			description: "교육청 코드 목록을 확인합니다.",
 			inputSchema: {},
+			annotations: {
+				readOnlyHint: true,
+				destructiveHint: false
+			}
 		},
 		async () => jsonContent(OFFICE_OF_EDUCATION_CODES)
 	);
@@ -50,6 +56,7 @@ const handler = createMcpHandler((server) => {
 	server.registerTool(
 		"search_schools",
 		{
+			title: "학교 찾기",
 			description:
 				"학교 이름과 (선택적으로) 교육청 코드를 사용해 NEIS에서 학교 기본정보를 검색합니다.",
 			inputSchema: {
@@ -64,6 +71,10 @@ const handler = createMcpHandler((server) => {
 					.default(20)
 					.describe("페이지당 결과 수"),
 			},
+			annotations: {
+				readOnlyHint: true,
+				destructiveHint: false
+			}
 		},
 		async (params) => jsonContent(await searchSchools(params))
 	);
@@ -71,6 +82,7 @@ const handler = createMcpHandler((server) => {
 	server.registerTool(
 		"get_school_meals",
 		{
+			title: "급식 메뉴 조회",
 			description:
 				"NEIS 급식 API를 통해 특정 학교의 급식 메뉴를 조회합니다. 날짜는 YYYYMMDD 형식입니다.",
 			inputSchema: {
@@ -82,6 +94,10 @@ const handler = createMcpHandler((server) => {
 					.describe("급식 코드: 1(조식), 2(중식), 3(석식)"),
 				...paginationSchema,
 			},
+			annotations: {
+				readOnlyHint: true,
+				destructiveHint: false
+			}
 		},
 		async (params) => jsonContent(await getSchoolMeals(params))
 	);
@@ -89,6 +105,7 @@ const handler = createMcpHandler((server) => {
 	server.registerTool(
 		"get_school_timetable",
 		{
+			title: "시간표 조회",
 			description:
 				"NEIS 시간표 API를 통해 특정 학년/학급의 시간표를 조회합니다. 날짜는 YYYYMMDD 형식입니다.",
 			inputSchema: {
@@ -101,6 +118,10 @@ const handler = createMcpHandler((server) => {
 				...dateRangeSchema,
 				...paginationSchema,
 			},
+			annotations: {
+				readOnlyHint: true,
+				destructiveHint: false
+			}
 		},
 		async (params) => jsonContent(await getSchoolTimetable(params))
 	);
@@ -108,6 +129,7 @@ const handler = createMcpHandler((server) => {
 	server.registerTool(
 		"get_academic_schedule",
 		{
+			title: "학사일정 조회",
 			description:
 				"학사일정 API를 통해 학교 행사 및 일정을 조회합니다. 날짜는 YYYYMMDD 형식입니다.",
 			inputSchema: {
@@ -115,9 +137,18 @@ const handler = createMcpHandler((server) => {
 				...dateRangeSchema,
 				...paginationSchema,
 			},
+			annotations: {
+				readOnlyHint: true,
+				destructiveHint: false
+			}
 		},
 		async (params) => jsonContent(await getAcademicSchedule(params))
 	);
+}, {
+	serverInfo: {
+		name: "NEIS MCP",
+		version: pkg.version
+	}
 });
 
-export { handler as GET, handler as POST, handler as DELETE };
+export { handler as GET, handler as POST };
