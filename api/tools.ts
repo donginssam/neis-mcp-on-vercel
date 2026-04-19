@@ -50,7 +50,7 @@ export async function searchSchools({
     coeducation: row.COEDU_SC_NM,
     address: row.ORG_RDNMA,
     address_detail: row.ORG_RDNDA ?? row.ORG_RDNMA,
-    postal_code: row.ORG_RDNZIP ?? row.ORG_ZIPNO ?? row.ORG_ZIP_CODE,
+    postal_code: row.ORG_RDNZC,
     telephone: row.ORG_TELNO,
     fax: row.ORG_FAXNO,
     homepage: row.HMPG_ADRES,

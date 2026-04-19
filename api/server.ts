@@ -40,6 +40,7 @@ function responseData(data: unknown[]) {
       type: "text" as const,
       text: JSON.stringify(row),
     })),
+    structuredContent: { items: data },
   }
 }
 
@@ -82,6 +83,30 @@ const handler = createMcpHandler(
             .default(20)
             .describe("페이지당 결과 수"),
         },
+        outputSchema: {
+          items: z
+            .array(
+              z.object({
+                education_office_code: z.string().describe("교육청 코드"),
+                education_office_name: z.string().describe("교육청 이름"),
+                school_code: z.string().describe("학교 코드"),
+                school_name: z.string().describe("학교 이름"),
+                english_name: z.string().describe("학교 영문 이름"),
+                school_type: z.string().describe("학교 유형"),
+                region_name: z.string().describe("지역 이름"),
+                foundation: z.string().describe("설립 구분"),
+                coeducation: z.string().describe("남녀공학 구분"),
+                address: z.string().describe("주소"),
+                address_detail: z.string().describe("상세 주소"),
+                postal_code: z.string().describe("우편번호"),
+                telephone: z.string().describe("전화번호"),
+                fax: z.string().describe("팩스번호"),
+                homepage: z.string().describe("홈페이지"),
+                established_date: z.string().describe("설립일자"),
+              }),
+            )
+            .describe("학교 목록"),
+        },
         annotations: {
           readOnlyHint: true,
           destructiveHint: false,
@@ -104,6 +129,24 @@ const handler = createMcpHandler(
             .optional()
             .describe("급식 코드: 1(조식), 2(중식), 3(석식)"),
           ...paginationSchema,
+        },
+        outputSchema: {
+          items: z
+            .array(
+              z.object({
+                date: z.string().describe("급식 일자 (YYYYMMDD)"),
+                meal_code: z.string().describe("급식 코드"),
+                meal_name: z.string().describe("급식명"),
+                calories: z.string().describe("칼로리"),
+                dishes: z.array(z.string()).describe("요리명 목록"),
+                origin_info: z.array(z.string()).describe("원산지 정보 목록"),
+                nutrition_info: z
+                  .array(z.string())
+                  .describe("영양소 정보 목록"),
+                school_name: z.string().describe("학교명"),
+              }),
+            )
+            .describe("급식 목록"),
         },
         annotations: {
           readOnlyHint: true,
@@ -129,6 +172,25 @@ const handler = createMcpHandler(
           ...dateRangeSchema,
           ...paginationSchema,
         },
+        outputSchema: {
+          items: z
+            .array(
+              z.object({
+                date: z.string().describe("날짜 (YYYYMMDD)"),
+                assembly_name: z.string().describe("학급명"),
+                grade: z.string().describe("학년"),
+                periods: z
+                  .array(
+                    z.object({
+                      period: z.string().describe("교시"),
+                      subject_name: z.string().describe("과목명"),
+                    }),
+                  )
+                  .describe("교시 목록"),
+              }),
+            )
+            .describe("시간표 목록"),
+        },
         annotations: {
           readOnlyHint: true,
           destructiveHint: false,
@@ -147,6 +209,17 @@ const handler = createMcpHandler(
           ...schoolIdentifierSchema,
           ...dateRangeSchema,
           ...paginationSchema,
+        },
+        outputSchema: {
+          items: z
+            .array(
+              z.object({
+                date: z.string().describe("일자 (YYYYMMDD)"),
+                event_name: z.string().describe("행사명"),
+                event_content: z.string().describe("행사 내용"),
+              }),
+            )
+            .describe("학사일정 목록"),
         },
         annotations: {
           readOnlyHint: true,
