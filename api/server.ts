@@ -34,8 +34,13 @@ const schoolIdentifierSchema = {
   school_code: z.string().describe("학교 코드"),
 }
 
-function jsonContent(data: unknown) {
-  return { content: [{ type: "text" as const, text: JSON.stringify(data) }] }
+function responseData(data: unknown[]) {
+  return {
+    content: data.map(row => ({
+      type: "text" as const,
+      text: JSON.stringify(row),
+    })),
+  }
 }
 
 const handler = createMcpHandler(
@@ -82,7 +87,7 @@ const handler = createMcpHandler(
           destructiveHint: false,
         },
       },
-      async params => jsonContent(await searchSchools(params)),
+      async params => responseData(await searchSchools(params)),
     )
 
     server.registerTool(
@@ -105,7 +110,7 @@ const handler = createMcpHandler(
           destructiveHint: false,
         },
       },
-      async params => jsonContent(await getSchoolMeals(params)),
+      async params => responseData(await getSchoolMeals(params)),
     )
 
     server.registerTool(
@@ -129,7 +134,7 @@ const handler = createMcpHandler(
           destructiveHint: false,
         },
       },
-      async params => jsonContent(await getSchoolTimetable(params)),
+      async params => responseData(await getSchoolTimetable(params)),
     )
 
     server.registerTool(
@@ -148,7 +153,7 @@ const handler = createMcpHandler(
           destructiveHint: false,
         },
       },
-      async params => jsonContent(await getAcademicSchedule(params)),
+      async params => responseData(await getAcademicSchedule(params)),
     )
   },
   {

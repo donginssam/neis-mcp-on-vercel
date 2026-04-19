@@ -87,13 +87,3 @@ function extractRows(endpoint: string, data: NeisApiResponse): NeisRow[] {
   }
   return rows
 }
-
-export function trimmer(raw: string | undefined): string[] {
-  if (!raw) return []
-  const separators = ["<br/>", "<br>", "\\n", "\n"]
-  let parts = [raw]
-  for (const sep of separators) {
-    parts = parts.flatMap(p => p.split(sep))
-  }
-  return parts.map(p => p.trim()).filter(Boolean)
-}

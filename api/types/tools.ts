@@ -35,3 +35,10 @@ export interface GetAcademicScheduleParams
   region_code: string
   school_code: string
 }
+
+export interface DayTimetable {
+  date: string
+  assembly_name: string
+  grade: string
+  periods: { period: string; subject_name: string }[]
+}

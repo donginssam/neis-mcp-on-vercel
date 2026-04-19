@@ -1,5 +1,5 @@
 import { TIMETABLE_ENDPOINTS } from "./constants.js"
-import { neisRequest, trimmer } from "./neis-client.js"
+import { neisRequest } from "./neis-client.js"
 import type { NeisParams } from "./types/neis.js"
 import type { DateRangeParams, PaginationParams } from "./types/tools.js"
 import type {
@@ -7,6 +7,7 @@ import type {
   GetSchoolMealsParams,
   GetSchoolTimetableParams,
   GetAcademicScheduleParams,
+  DayTimetable,
 } from "./types/tools.js"
 
 function buildPaginationParams({
@@ -117,15 +118,26 @@ export async function getSchoolTimetable({
     ),
     ...buildPaginationParams(pagination),
   })
-  return rows
-    .filter(row => row.ITRT_CNTNT != null)
-    .map(row => ({
-      date: row.ALL_TI_YMD,
-      period: row.PERIO,
-      subject_name: row.ITRT_CNTNT,
-      assembly_name: row.CLASS_NM,
-      grade: row.GRADE,
-    }))
+  const grouped = new Map<string, DayTimetable>()
+
+  for (const row of rows) {
+    if (row.ITRT_CNTNT == null) continue
+
+    const date = row.ALL_TI_YMD as string
+    const day = grouped.get(date) ?? {
+      date,
+      assembly_name: row.CLASS_NM as string,
+      grade: row.GRADE as string,
+      periods: [],
+    }
+    day.periods.push({
+      period: row.PERIO as string,
+      subject_name: row.ITRT_CNTNT as string,
+    })
+    grouped.set(date, day)
+  }
+
+  return Array.from(grouped.values())
 }
 
 export async function getAcademicSchedule({
@@ -150,4 +162,14 @@ export async function getAcademicSchedule({
     event_name: row.EVENT_NM,
     event_content: row.EVENT_CNTNT,
   }))
+}
+
+function trimmer(raw: string | string[] | undefined): string[] {
+  if (!raw) return []
+  const separators = ["<br/>", "<br>", "\\n", "\n"]
+  let parts = Array.isArray(raw) ? raw : [raw]
+  for (const sep of separators) {
+    parts = parts.flatMap(p => p.split(sep))
+  }
+  return parts.map(p => p.trim()).filter(Boolean)
 }

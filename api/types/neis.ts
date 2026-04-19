@@ -1,4 +1,4 @@
-export type NeisRow = Record<string, string>
+export type NeisRow = Record<string, string | string[]>
 
 export interface NeisResultInfo {
   CODE: string
