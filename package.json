@@ -6,11 +6,17 @@
   "packageManager": "pnpm@10.33.0",
   "dependencies": {
     "mcp-handler": "^1.1.0",
-    "zod": "^3.23.0"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@types/node": "^22.0.0",
-    "typescript": "^6.0.3"
+    "@types/node": "^22.19.17",
+    "eslint": "^10.2.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.5.0",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.58.2"
   }
 }

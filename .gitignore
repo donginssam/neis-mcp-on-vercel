@@ -3,9 +3,7 @@ node_modules/
 npm-debug.log*
 
 # TypeScript
-dist/
 *.tsbuildinfo
-
 
 .vercel
 .env*.local

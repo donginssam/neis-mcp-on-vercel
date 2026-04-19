@@ -1,0 +1,9 @@
+node_modules/
+npm-debug.log*
+README.md
+.prettierrc
+.claude
+.vercel
+.env*.local
+.DS_Store
+pnpm-lock.yaml
