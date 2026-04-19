@@ -40,18 +40,23 @@ function jsonContent(data: unknown) {
 
 const handler = createMcpHandler(
   server => {
-    server.registerTool(
+    server.registerResource(
       "list_education_office_codes",
+      "neis://education-office-codes",
       {
-        title: "교육청 코드 목록 나열",
-        description: "교육청 코드 목록을 확인합니다.",
-        inputSchema: {},
-        annotations: {
-          readOnlyHint: true,
-          destructiveHint: false,
-        },
+        title: "교육청 코드 목록",
+        description: "교육청 코드 목록입니다.",
+        mimeType: "application/json",
       },
-      async () => jsonContent(OFFICE_OF_EDUCATION_CODES),
+      async () => ({
+        contents: [
+          {
+            uri: "neis://education-office-codes",
+            text: JSON.stringify(OFFICE_OF_EDUCATION_CODES),
+            mimeType: "application/json",
+          },
+        ],
+      }),
     )
 
     server.registerTool(
