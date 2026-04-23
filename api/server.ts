@@ -9,16 +9,16 @@ import {
   getAcademicSchedule,
 } from "./tools.js"
 
-const paginationSchema = {
+const createPaginationSchema = (defaultPageSize = 100) => ({
   page: z.number().int().min(1).default(1).describe("페이지 번호"),
   page_size: z
     .number()
     .int()
     .min(1)
     .max(1000)
-    .default(100)
+    .default(defaultPageSize)
     .describe("페이지당 결과 수"),
-}
+})
 
 const dateRangeSchema = {
   date: z
@@ -34,11 +34,16 @@ const schoolIdentifierSchema = {
   school_code: z.string().describe("학교 코드"),
 }
 
+/**
+ * MCP 서버의 규격에 맞게 응답 데이터를 포맷팅합니다.
+ * @param data 변환할 결과 데이터 배열
+ * @returns MCP 응답 객체 (텍스트 형태와 구조화된 형태 모두 포함)
+ */
 function responseData(data: unknown[]) {
   return {
     content: data.map(row => ({
       type: "text" as const,
-      text: JSON.stringify(row),
+      text: JSON.stringify(row, null, 2),
     })),
     structuredContent: { items: data },
   }
@@ -74,14 +79,7 @@ const handler = createMcpHandler(
         inputSchema: {
           school_name: z.string().describe("검색할 학교 이름"),
           region_code: z.string().optional().describe("교육청 코드 (선택)"),
-          ...paginationSchema,
-          page_size: z
-            .number()
-            .int()
-            .min(1)
-            .max(1000)
-            .default(20)
-            .describe("페이지당 결과 수"),
+          ...createPaginationSchema(20),
         },
         outputSchema: {
           items: z
@@ -128,7 +126,7 @@ const handler = createMcpHandler(
             .string()
             .optional()
             .describe("급식 코드: 1(조식), 2(중식), 3(석식)"),
-          ...paginationSchema,
+          ...createPaginationSchema(),
         },
         outputSchema: {
           items: z
@@ -170,7 +168,7 @@ const handler = createMcpHandler(
           grade: z.string().describe("학년"),
           class_name: z.string().describe("학급명"),
           ...dateRangeSchema,
-          ...paginationSchema,
+          ...createPaginationSchema(),
         },
         outputSchema: {
           items: z
@@ -208,7 +206,7 @@ const handler = createMcpHandler(
         inputSchema: {
           ...schoolIdentifierSchema,
           ...dateRangeSchema,
-          ...paginationSchema,
+          ...createPaginationSchema(),
         },
         outputSchema: {
           items: z

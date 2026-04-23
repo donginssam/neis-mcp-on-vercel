@@ -8,6 +8,12 @@ import type {
   NeisParams,
 } from "./types/neis.js"
 
+/**
+ * NEIS API에 HTTP 요청을 보내고 응답 데이터를 파싱하여 반환합니다.
+ * @param endpoint API 엔드포인트 문자열
+ * @param params API에 전달할 파라미터 객체
+ * @returns NEIS API 응답의 결과 행(row) 배열
+ */
 export async function neisRequest(
   endpoint: string,
   params: NeisParams = {},
@@ -51,6 +57,13 @@ export async function neisRequest(
   return extractRows(endpoint, data)
 }
 
+/**
+ * NEIS API 응답 데이터에서 결과 행(row) 데이터만 추출하여 반환합니다.
+ * 오류가 포함된 경우 예외를 발생시킵니다.
+ * @param endpoint 요청한 API 엔드포인트 문자열
+ * @param data NEIS API 전체 응답 객체
+ * @returns 추출된 행(row) 배열
+ */
 function extractRows(endpoint: string, data: NeisApiResponse): NeisRow[] {
   const dataset = data[endpoint] as NeisDataset[] | undefined
   if (!dataset) {

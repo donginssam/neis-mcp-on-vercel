@@ -10,6 +10,11 @@ import type {
   DayTimetable,
 } from "./types/tools.js"
 
+/**
+ * 페이징 파라미터를 NEIS API 파라미터 형식으로 변환합니다.
+ * @param params 페이징 파라미터 (page, page_size)
+ * @returns NEIS API 형식의 페이징 파라미터 객체
+ */
 function buildPaginationParams({
   page,
   page_size,
@@ -17,6 +22,12 @@ function buildPaginationParams({
   return { pIndex: page, pSize: page_size }
 }
 
+/**
+ * 날짜 파라미터를 NEIS API 파라미터 형식으로 변환합니다.
+ * @param params 날짜 범위 파라미터 (date, start_date, end_date)
+ * @param keys 변환할 NEIS API의 키 매핑 (exact, from, to)
+ * @returns NEIS API 형식의 날짜 파라미터 객체
+ */
 function buildDateParams(
   { date, start_date, end_date }: DateRangeParams,
   keys: { exact: string; from: string; to: string },
@@ -28,6 +39,11 @@ function buildDateParams(
   }
 }
 
+/**
+ * 학교명과 (선택적으로) 교육청 코드를 사용하여 학교 기본정보를 검색합니다.
+ * @param params 검색 파라미터 (학교명, 교육청 코드, 페이징 정보)
+ * @returns 검색된 학교 정보 목록
+ */
 export async function searchSchools({
   school_name,
   region_code,
@@ -58,6 +74,11 @@ export async function searchSchools({
   }))
 }
 
+/**
+ * 특정 학교의 급식 메뉴를 조회합니다.
+ * @param params 조회 파라미터 (교육청/학교/급식 코드, 조회 일자/기간 등)
+ * @returns 급식 메뉴 정보 목록
+ */
 export async function getSchoolMeals({
   region_code,
   school_code,
@@ -89,6 +110,11 @@ export async function getSchoolMeals({
   }))
 }
 
+/**
+ * 특정 학년/학급의 시간표를 조회합니다.
+ * @param params 조회 파라미터 (학교 급별, 교육청/학교 코드, 학년/반, 조회 일자/기간 등)
+ * @returns 일자별로 그룹화된 시간표 목록
+ */
 export async function getSchoolTimetable({
   school_level,
   region_code,
@@ -140,6 +166,11 @@ export async function getSchoolTimetable({
   return Array.from(grouped.values())
 }
 
+/**
+ * 학교의 학사일정을 조회합니다.
+ * @param params 조회 파라미터 (교육청/학교 코드, 조회 일자/기간 등)
+ * @returns 학사일정 정보 목록
+ */
 export async function getAcademicSchedule({
   region_code,
   school_code,
@@ -164,12 +195,16 @@ export async function getAcademicSchedule({
   }))
 }
 
+/**
+ * 문자열 또는 배열 내의 구분자(<br/>, \n 등)를 기준으로 문자열을 분리하고 공백을 제거합니다.
+ * @param raw 원본 문자열 또는 배열
+ * @returns 정리된 문자열 배열
+ */
 function trimmer(raw: string | string[] | undefined): string[] {
   if (!raw) return []
-  const separators = ["<br/>", "<br>", "\\n", "\n"]
-  let parts = Array.isArray(raw) ? raw : [raw]
-  for (const sep of separators) {
-    parts = parts.flatMap(p => p.split(sep))
-  }
-  return parts.map(p => p.trim()).filter(Boolean)
+  const parts = Array.isArray(raw) ? raw : [raw]
+  return parts
+    .flatMap(p => p.split(/<br\s*\/?>|\\n|\n/i))
+    .map(p => p.trim())
+    .filter(Boolean)
 }

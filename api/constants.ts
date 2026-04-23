@@ -1,5 +1,11 @@
+/**
+ * NEIS Open API 기본 URL
+ */
 export const NEIS_BASE_URL = "https://open.neis.go.kr/hub"
 
+/**
+ * 학교 급별 시간표 API 엔드포인트 매핑
+ */
 export const TIMETABLE_ENDPOINTS: Record<string, string> = {
   elementary: "elsTimetable",
   middle: "misTimetable",
@@ -7,6 +13,9 @@ export const TIMETABLE_ENDPOINTS: Record<string, string> = {
   special: "spsTimetable",
 }
 
+/**
+ * 시도교육청별 코드 매핑
+ */
 export const OFFICE_OF_EDUCATION_CODES: Record<string, string> = {
   서울특별시교육청: "B10",
   부산광역시교육청: "C10",
