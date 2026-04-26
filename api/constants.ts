@@ -1,10 +1,10 @@
 /**
- * NEIS Open API 기본 URL
+ * NEIS OpenAPI 기본 URL
  */
 export const NEIS_BASE_URL = "https://open.neis.go.kr/hub"
 
 /**
- * 학교 급별 시간표 API 엔드포인트 매핑
+ * 학교급별 시간표 API 엔드포인트 매핑
  */
 export const TIMETABLE_ENDPOINTS: Record<string, string> = {
   elementary: "elsTimetable",

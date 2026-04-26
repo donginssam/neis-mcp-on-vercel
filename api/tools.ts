@@ -11,9 +11,9 @@ import type {
 } from "./types/tools.js"
 
 /**
- * 페이징 파라미터를 NEIS API 파라미터 형식으로 변환합니다.
+ * 페이징 파라미터를 NEIS OpenAPI 파라미터 형식으로 변환합니다.
  * @param params 페이징 파라미터 (page, page_size)
- * @returns NEIS API 형식의 페이징 파라미터 객체
+ * @returns NEIS OpenAPI 형식의 페이징 파라미터 객체
  */
 function buildPaginationParams({
   page,
@@ -23,10 +23,10 @@ function buildPaginationParams({
 }
 
 /**
- * 날짜 파라미터를 NEIS API 파라미터 형식으로 변환합니다.
+ * 날짜 파라미터를 NEIS OpenAPI 파라미터 형식으로 변환합니다.
  * @param params 날짜 범위 파라미터 (date, start_date, end_date)
- * @param keys 변환할 NEIS API의 키 매핑 (exact, from, to)
- * @returns NEIS API 형식의 날짜 파라미터 객체
+ * @param keys 변환할 NEIS OpenAPI의 키 매핑 (exact, from, to)
+ * @returns NEIS OpenAPI 형식의 날짜 파라미터 객체
  */
 function buildDateParams(
   { date, start_date, end_date }: DateRangeParams,
@@ -46,32 +46,35 @@ function buildDateParams(
  */
 export async function searchSchools({
   school_name,
-  region_code,
+  education_office_code,
   ...pagination
 }: SearchSchoolsParams) {
-  const rows = await neisRequest("schoolInfo", {
+  const { rows, total } = await neisRequest("schoolInfo", {
     SCHUL_NM: school_name,
-    ATPT_OFCDC_SC_CODE: region_code,
+    ATPT_OFCDC_SC_CODE: education_office_code,
     ...buildPaginationParams(pagination),
   })
-  return rows.map(row => ({
-    education_office_code: row.ATPT_OFCDC_SC_CODE,
-    education_office_name: row.ATPT_OFCDC_SC_NM,
-    school_code: row.SD_SCHUL_CODE,
-    school_name: row.SCHUL_NM,
-    english_name: row.ENG_SCHUL_NM,
-    school_type: row.SCHUL_KND_SC_NM,
-    region_name: row.LCTN_SC_NM,
-    foundation: row.FOND_SC_NM,
-    coeducation: row.COEDU_SC_NM,
-    address: row.ORG_RDNMA,
-    address_detail: row.ORG_RDNDA ?? row.ORG_RDNMA,
-    postal_code: row.ORG_RDNZC,
-    telephone: row.ORG_TELNO,
-    fax: row.ORG_FAXNO,
-    homepage: row.HMPG_ADRES,
-    established_date: row.FOND_YMD,
-  }))
+  return {
+    data: rows.map(row => ({
+      education_office_code: row.ATPT_OFCDC_SC_CODE,
+      education_office_name: row.ATPT_OFCDC_SC_NM,
+      school_code: row.SD_SCHUL_CODE,
+      school_name: row.SCHUL_NM,
+      english_name: row.ENG_SCHUL_NM,
+      school_type: row.SCHUL_KND_SC_NM,
+      region_name: row.LCTN_SC_NM,
+      foundation: row.FOND_SC_NM,
+      coeducation: row.COEDU_SC_NM,
+      address: row.ORG_RDNMA,
+      address_detail: row.ORG_RDNDA ?? row.ORG_RDNMA,
+      postal_code: row.ORG_RDNZC,
+      telephone: row.ORG_TELNO,
+      fax: row.ORG_FAXNO,
+      homepage: row.HMPG_ADRES,
+      established_date: row.FOND_YMD,
+    })),
+    total,
+  }
 }
 
 /**
@@ -80,7 +83,7 @@ export async function searchSchools({
  * @returns 급식 메뉴 정보 목록
  */
 export async function getSchoolMeals({
-  region_code,
+  education_office_code,
   school_code,
   meal_code,
   date,
@@ -88,8 +91,8 @@ export async function getSchoolMeals({
   end_date,
   ...pagination
 }: GetSchoolMealsParams) {
-  const rows = await neisRequest("mealServiceDietInfo", {
-    ATPT_OFCDC_SC_CODE: region_code,
+  const { rows, total } = await neisRequest("mealServiceDietInfo", {
+    ATPT_OFCDC_SC_CODE: education_office_code,
     SD_SCHUL_CODE: school_code,
     MMEAL_SC_CODE: meal_code,
     ...buildDateParams(
@@ -98,16 +101,19 @@ export async function getSchoolMeals({
     ),
     ...buildPaginationParams(pagination),
   })
-  return rows.map(row => ({
-    date: row.MLSV_YMD,
-    meal_code: row.MMEAL_SC_CODE,
-    meal_name: row.MMEAL_SC_NM,
-    calories: row.CAL_INFO,
-    dishes: trimmer(row.DDISH_NM),
-    origin_info: trimmer(row.ORPLC_INFO),
-    nutrition_info: trimmer(row.NTR_INFO),
-    school_name: row.SCHUL_NM,
-  }))
+  return {
+    data: rows.map(row => ({
+      date: row.MLSV_YMD,
+      meal_code: row.MMEAL_SC_CODE,
+      meal_name: row.MMEAL_SC_NM,
+      calories: row.CAL_INFO,
+      dishes: trimmer(row.DDISH_NM),
+      origin_info: trimmer(row.ORPLC_INFO),
+      nutrition_info: trimmer(row.NTR_INFO),
+      school_name: row.SCHUL_NM,
+    })),
+    total,
+  }
 }
 
 /**
@@ -117,7 +123,7 @@ export async function getSchoolMeals({
  */
 export async function getSchoolTimetable({
   school_level,
-  region_code,
+  education_office_code,
   school_code,
   grade,
   class_name,
@@ -133,8 +139,8 @@ export async function getSchoolTimetable({
     )
   }
 
-  const rows = await neisRequest(endpoint, {
-    ATPT_OFCDC_SC_CODE: region_code,
+  const { rows, total } = await neisRequest(endpoint, {
+    ATPT_OFCDC_SC_CODE: education_office_code,
     SD_SCHUL_CODE: school_code,
     GRADE: grade,
     CLASS_NM: class_name,
@@ -163,7 +169,7 @@ export async function getSchoolTimetable({
     grouped.set(date, day)
   }
 
-  return Array.from(grouped.values())
+  return { data: Array.from(grouped.values()), total }
 }
 
 /**
@@ -172,15 +178,15 @@ export async function getSchoolTimetable({
  * @returns 학사일정 정보 목록
  */
 export async function getAcademicSchedule({
-  region_code,
+  education_office_code,
   school_code,
   date,
   start_date,
   end_date,
   ...pagination
 }: GetAcademicScheduleParams) {
-  const rows = await neisRequest("SchoolSchedule", {
-    ATPT_OFCDC_SC_CODE: region_code,
+  const { rows, total } = await neisRequest("SchoolSchedule", {
+    ATPT_OFCDC_SC_CODE: education_office_code,
     SD_SCHUL_CODE: school_code,
     ...buildDateParams(
       { date, start_date, end_date },
@@ -188,11 +194,14 @@ export async function getAcademicSchedule({
     ),
     ...buildPaginationParams(pagination),
   })
-  return rows.map(row => ({
-    date: row.AA_YMD,
-    event_name: row.EVENT_NM,
-    event_content: row.EVENT_CNTNT,
-  }))
+  return {
+    data: rows.map(row => ({
+      date: row.AA_YMD,
+      event_name: row.EVENT_NM,
+      event_content: row.EVENT_CNTNT,
+    })),
+    total,
+  }
 }
 
 /**
